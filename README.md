@@ -2,6 +2,8 @@
 
 Primeira aplicação em Node JS, back e front
 
+https://www.youtube.com/watch?v=PyrMT0GA3sE
+
 ## HTTP Methods
 
 ```TXT
