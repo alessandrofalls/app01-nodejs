@@ -1,11 +1,10 @@
 import express from 'express'
+import { PrismaClient } from '@prisma/client'
+import { PrismaClientValidationError } from '@prisma/client/runtime/library'
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://alessandrofalls:1OQYnpq8bUppEsdl@clusteraws-sp.okevs.mongodb.net/?retryWrites=true&w=majority&appName=ClusterAWS-SP";
+const prisma = new PrismaClient()
 
 const app = express()
-
-const users = []
 
 app.use(express.json())
 
@@ -19,17 +18,27 @@ app.use(express.json())
     mongodb+srv://alessandrofalls:1OQYnpq8bUppEsdl@clusteraws-sp.okevs.mongodb.net/?retryWrites=true&w=majority&appName=ClusterAWS-SP
 */
 
-app.get('/users', (req, res) =>  {
-    res.status(200).json(users)
+app.get('/users', async (req, res) =>  {
+    
+  const users = await prisma.user.findMany();
+  
+  res.status(200).json(users)
 
 })
 
-app.post('/users', (req, res) =>  {
+app.post('/users', async (req, res) =>  {
     
-    console.log(req.body)
-
+   /* console.log(req.body)
     users.push(req.body)
-    
+   */
+  await prisma.user.create({
+    data: {
+      email: req.body.email,
+      name: req.body.name,
+      age: req.body.age
+    }
+
+  }) 
     res.status(201).json(req.body)
 
 })
@@ -43,30 +52,3 @@ app.listen(3000)
     - Edit user
     - Delete user
 */
-
-
-
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
-
